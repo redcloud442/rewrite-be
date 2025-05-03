@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas   = ["public", "user_schema","form_schema"]
+}
+
+model user_table {
+  user_id            String   @id
+  user_first_name    String
+  user_last_name     String
+  user_email         String   @unique
+  user_created_at    DateTime @default(now())
+  user_updated_at    DateTime @updatedAt
+
+  user_form_responses user_form_response_table[]  // ✅ relation fixed
+
+  @@map("user")
+  @@schema("user_schema")
+}
+
+model form_table {
+  form_id     String   @id @default(uuid())
+  form_name   String
+  form_type   String    // 'onboarding', 'survey', etc.
+  created_at  DateTime  @default(now())
+
+  sections    form_section_table[]
+
+  @@map("form")
+  @@schema("form_schema")
+}
+
+model form_section_table {
+  section_id    String   @id @default(uuid())
+  section_name  String
+  section_order Int
+
+  section_form_id String
+  form  form_table @relation(fields: [section_form_id], references: [form_id])
+
+  fields form_field_table[]
+
+  @@map("form_section")
+  @@schema("form_schema")
+}
+
+model form_field_table {
+  field_id    String   @id @default(uuid())
+  field_label String
+  field_type  String    // 'text', 'select', 'multi-select'
+  field_order Int
+
+  field_section_id String
+  section form_section_table @relation(fields: [field_section_id], references: [section_id])
+
+  options form_option_table[]
+  user_form_responses user_form_response_table[]  // ✅ responses linked to this field
+
+  @@map("form_field")
+  @@schema("form_schema")
+}
+
+model form_option_table {
+  option_id     String @id @default(uuid())
+  option_label  String
+
+  option_field_id String
+  field form_field_table @relation(fields: [option_field_id], references: [field_id])
+
+  @@map("form_option")
+  @@schema("form_schema")
+}
+
+model user_form_response_table {
+  response_id       String   @id @default(uuid())
+  response_user_id  String
+  response_field_id String
+  response_value    String
+
+  user  user_table @relation(fields: [response_user_id], references: [user_id])  // ✅ correct relation
+  field form_field_table @relation(fields: [response_field_id], references: [field_id])
+
+  @@unique([response_user_id, response_field_id])
+  @@map("user_form_response")
+  @@schema("form_schema")
+}
