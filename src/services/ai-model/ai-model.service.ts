@@ -1,13 +1,18 @@
 import { Injectable } from "@nestjs/common";
 
 import { User } from "@clerk/backend";
+import {
+  PrismaReadReplicaService,
+  PrismaService,
+} from "src/prisma/prisma.service";
 import { OpenaiService } from "../openai/openai.service";
 import { aiModelDtoType } from "./dto/ai-model.dto";
 
 @Injectable()
 export class AiModelService {
   constructor(
-    // private readonly prisma: PrismaService,
+    private readonly prisma: PrismaService,
+    private readonly prismaRead: PrismaReadReplicaService,
     private readonly openaiService: OpenaiService
   ) {}
 
@@ -29,19 +34,46 @@ export class AiModelService {
   }
 
   async askAi(aiModelDto: aiModelDtoType, user: User) {
-    const { message } = aiModelDto;
-    const response = await this.openaiService.chatGptRequest(
+    const { message, selectedRecordingId } = aiModelDto;
+    // Step 1: Get the recording ID
+    let recordingId: string | null = selectedRecordingId;
+
+    if (!recordingId) {
+      const latestRecording =
+        await this.prismaRead.user_recording_table.findFirst({
+          where: { recording_user_id: user.id },
+          select: { recording_id: true },
+          orderBy: { recording_created_at: "desc" },
+        });
+
+      recordingId = latestRecording?.recording_id || null;
+    }
+
+    const responseText = await this.openaiService.chatGptRequest(
       `Hi I am ${user.firstName}. You are a helpful assistant that can answer questions and help with tasks.`,
-      [
-        {
-          text: message,
-          ai: false,
-        },
-      ]
+      [{ text: message, ai: false }]
     );
 
+    const userMessage = {
+      message_user_id: user.id,
+      message_recording: message,
+      message_recording_id: recordingId || "",
+      message_is_ai: false,
+    };
+
+    const aiMessage = {
+      message_user_id: user.id,
+      message_recording: responseText,
+      message_recording_id: recordingId || "",
+      message_is_ai: true,
+    };
+
+    await this.prisma.user_message_recording_table.createMany({
+      data: [userMessage, aiMessage],
+    });
+
     return {
-      text: response,
+      text: responseText,
       ai: true,
     };
   }

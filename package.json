@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "@aws-sdk/client-polly": "^3.799.0",
+        "@aws-sdk/client-s3": "^3.802.0",
         "@clerk/backend": "^1.30.2",
         "@nestjs/common": "^11.0.1",
         "@nestjs/config": "^4.0.2",

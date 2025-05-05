@@ -8,7 +8,7 @@ datasource db {
   url       = env("DATABASE_URL")
 //   relationMode = "prisma"
 //   directUrl    = env("DATABASE_READ_URL")
-  schemas   = ["public", "user_schema","form_schema"]
+  schemas   = ["public", "user_schema","form_schema","recording_schema"]
 }
 
 model user_table {
@@ -20,6 +20,8 @@ model user_table {
   user_updated_at    DateTime @updatedAt
 
   user_form_responses user_form_response_table[]  // ✅ relation fixed
+  user_recording user_recording_table[]
+  user_message_recording user_message_recording_table[]
 
   @@map("user")
   @@schema("user_schema")
@@ -92,4 +94,34 @@ model user_form_response_table {
   @@unique([response_user_id, response_field_id])
   @@map("user_form_response")
   @@schema("form_schema")
+}
+
+model user_recording_table {
+  recording_id String @id @default(dbgenerated("gen_random_uuid()"))
+  recording_user_id String
+  recording_url String
+  recording_name String
+  recording_created_at DateTime @default(now())
+  recording_updated_at DateTime @updatedAt
+
+  user user_table @relation(fields: [recording_user_id], references: [user_id])
+  user_message_recording user_message_recording_table[]
+
+  @@map("user_recording")
+  @@schema("recording_schema")
+}
+
+model user_message_recording_table {
+  message_id String @id @default(dbgenerated("gen_random_uuid()"))
+  message_user_id String
+  message_recording String
+  message_recording_id String
+  message_is_ai Boolean @default(false)
+  message_created_at DateTime @default(now())
+
+  user user_table @relation(fields: [message_user_id], references: [user_id])
+  recording user_recording_table @relation(fields: [message_recording_id], references: [recording_id])
+
+  @@map("user_message_recording")
+  @@schema("recording_schema")
 }

@@ -1,11 +1,12 @@
 import { Module } from "@nestjs/common";
+import { PrismaModule } from "src/prisma/prisma.module";
 import { AiModelModule } from "../ai-model/ai-model.module";
-import { SupabaseModule } from "../supabase/supabase.module";
+import { AwsModule } from "../aws/aws.module";
 import { TtsController } from "./tts.controller";
 import { TtsService } from "./tts.service";
 
 @Module({
-  imports: [AiModelModule, SupabaseModule],
+  imports: [AiModelModule, PrismaModule, AwsModule],
   controllers: [TtsController],
   providers: [TtsService],
   exports: [TtsService],
