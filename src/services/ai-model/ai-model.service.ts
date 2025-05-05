@@ -46,19 +46,19 @@ export class AiModelService {
     };
   }
 
-  findAll() {
-    return `This action returns all aiModel`;
-  }
+  //   findAll() {
+  //     return `This action returns all aiModel`;
+  //   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} aiModel`;
-  }
+  //   findOne(id: number) {
+  //     return `This action returns a #${id} aiModel`;
+  //   }
 
-  update(id: number) {
-    return `This action updates a #${id} aiModel`;
-  }
+  //   update(id: number) {
+  //     return `This action updates a #${id} aiModel`;
+  //   }
 
-  remove(id: number) {
-    return `This action removes a #${id} aiModel`;
-  }
+  //   remove(id: number) {
+  //     return `This action removes a #${id} aiModel`;
+  //   }
 }

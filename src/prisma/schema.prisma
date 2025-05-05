@@ -6,7 +6,8 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+//   relationMode = "prisma"
+//   directUrl    = env("DATABASE_READ_URL")
   schemas   = ["public", "user_schema","form_schema"]
 }
 
@@ -25,7 +26,7 @@ model user_table {
 }
 
 model form_table {
-  form_id     String   @id @default(uuid())
+  form_id     String   @id @default(dbgenerated("gen_random_uuid()"))
   form_name   String
   form_type   String    // 'onboarding', 'survey', etc.
   created_at  DateTime  @default(now())
@@ -37,7 +38,7 @@ model form_table {
 }
 
 model form_section_table {
-  section_id    String   @id @default(uuid())
+  section_id    String   @id @default(dbgenerated("gen_random_uuid()"))
   section_name  String
   section_order Int
 
@@ -51,10 +52,12 @@ model form_section_table {
 }
 
 model form_field_table {
-  field_id    String   @id @default(uuid())
+  field_id    String   @id @default(dbgenerated("gen_random_uuid()"))
   field_label String
   field_type  String    // 'text', 'select', 'multi-select'
   field_order Int
+  field_required Boolean @default(false)
+  field_is_onboarding Boolean @default(false)
 
   field_section_id String
   section form_section_table @relation(fields: [field_section_id], references: [section_id])
@@ -67,7 +70,7 @@ model form_field_table {
 }
 
 model form_option_table {
-  option_id     String @id @default(uuid())
+  option_id     String @id @default(dbgenerated("gen_random_uuid()"))
   option_label  String
 
   option_field_id String
@@ -78,7 +81,7 @@ model form_option_table {
 }
 
 model user_form_response_table {
-  response_id       String   @id @default(uuid())
+  response_id       String   @id @default(dbgenerated("gen_random_uuid()"))
   response_user_id  String
   response_field_id String
   response_value    String

@@ -14,3 +14,27 @@ export class PrismaService
     await this.$disconnect();
   }
 }
+
+@Injectable()
+export class PrismaReadReplicaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
+  constructor() {
+    super({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_READ_URL,
+        },
+      },
+    });
+  }
+
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
+}

@@ -1,14 +1,5 @@
 import { User } from "@clerk/backend";
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Res,
-} from "@nestjs/common";
+import { Body, Controller, Post, Res } from "@nestjs/common";
 import { Response } from "express";
 import { ZodValidationPipe } from "src/common/pipe/zod.validationPipe";
 import { CurrentUser } from "src/decorators/auth.decorator";
@@ -40,23 +31,23 @@ export class AiModelController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.aiModelService.findAll();
-  }
+  //   @Get()
+  //   findAll() {
+  //     return this.aiModelService.findAll();
+  //   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.aiModelService.findOne(+id);
-  }
+  //   @Get(":id")
+  //   findOne(@Param("id") id: string) {
+  //     return this.aiModelService.findOne(+id);
+  //   }
 
-  @Patch(":id")
-  update(@Param("id") id: string) {
-    return this.aiModelService.update(+id);
-  }
+  //   @Patch(":id")
+  //   update(@Param("id") id: string) {
+  //     return this.aiModelService.update(+id);
+  //   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.aiModelService.remove(+id);
-  }
+  //   @Delete(":id")
+  //   remove(@Param("id") id: string) {
+  //     return this.aiModelService.remove(+id);
+  //   }
 }
