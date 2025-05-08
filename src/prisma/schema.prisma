@@ -8,7 +8,7 @@ datasource db {
   url       = env("DATABASE_URL")
 //   relationMode = "prisma"
 //   directUrl    = env("DATABASE_READ_URL")
-  schemas   = ["public", "user_schema","form_schema","recording_schema"]
+  schemas   = ["public", "user_schema","form_schema","recording_schema","note_schema"]
 }
 
 model user_table {
@@ -22,7 +22,7 @@ model user_table {
   user_form_responses user_form_response_table[]  // ✅ relation fixed
   user_recording user_recording_table[]
   user_message_recording user_message_recording_table[]
-
+  user_notes note_table[]
   @@map("user")
   @@schema("user_schema")
 }
@@ -124,4 +124,18 @@ model user_message_recording_table {
 
   @@map("user_message_recording")
   @@schema("recording_schema")
+}
+
+model note_table {
+  note_id String @id @default(dbgenerated("gen_random_uuid()"))
+  note_user_id String
+  note_contentHTML String
+  note_contentJSON Json
+  note_created_at DateTime @default(now())
+  note_updated_at DateTime @updatedAt
+
+  user user_table @relation(fields: [note_user_id], references: [user_id])
+
+  @@map("note")
+  @@schema("note_schema")
 }
